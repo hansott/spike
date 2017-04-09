@@ -12,21 +12,21 @@ export class Program implements Statement {
 
 export class IfStatement implements Statement {
     condition: Expression;
-    ifBlock: BlockStatement;
-    constructor(condition: Expression, ifBlock: BlockStatement) {
+    ifStatements: Statement[];
+    constructor(condition: Expression, ifStatements: Statement[]) {
         this.condition = condition;
-        this.ifBlock = ifBlock;
+        this.ifStatements = ifStatements;
     }
 }
 
 export class IfElseStatement implements Statement {
     condition: Expression;
-    ifBlock: BlockStatement;
-    elseBlock: BlockStatement;
-    constructor(condition: Expression, ifBlock: BlockStatement, elseBlock: BlockStatement) {
+    ifStatements: Statement[];
+    elseStatements: Statement[];
+    constructor(condition: Expression, ifStatements: Statement[], elseStatements: Statement[]) {
         this.condition = condition;
-        this.ifBlock = ifBlock;
-        this.elseBlock = elseBlock;
+        this.ifStatements = ifStatements;
+        this.elseStatements = elseStatements;
     }
 }
 
@@ -46,12 +46,12 @@ export class BlockStatement implements Statement {
 
 export class FunctionDeclaration implements Statement {
     name: string;
-    block: BlockStatement;
+    statements: Statement[];
     params: string[];
-    constructor(name: string, params: string[], block: BlockStatement) {
+    constructor(name: string, params: string[], statements: Statement[]) {
         this.name = name;
         this.params = params;
-        this.block = block;
+        this.statements = statements;
     }
 }
 
