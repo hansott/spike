@@ -105,8 +105,14 @@ export function createBinary(left: Expression, operator: Token, right: Expressio
     if (operator.is(TokenType.Plus)) {
         return new Addition(left, right);
     }
+    if (operator.is(TokenType.Min)) {
+        return new Subtraction(left, right);
+    }
     if (operator.is(TokenType.Divide)) {
         return new Division(left, right);
+    }
+    if (operator.is(TokenType.Multiply)) {
+        return new Multiplication(left, right);
     }
     if (operator.is(TokenType.Equal)) {
         return new Assignment(left, right);
@@ -114,7 +120,7 @@ export function createBinary(left: Expression, operator: Token, right: Expressio
     throw new Error;
 }
 
-export class Assignment implements Expression {
+abstract class Binary implements Expression {
     left: Expression;
     right: Expression;
     constructor(left: Expression, right: Expression) {
@@ -123,20 +129,8 @@ export class Assignment implements Expression {
     }
 }
 
-export class Addition implements Expression {
-    left: Expression;
-    right: Expression;
-    constructor(left: Expression, right: Expression) {
-        this.left = left;
-        this.right = right;
-    }
-}
-
-export class Division implements Expression {
-    left: Expression;
-    right: Expression;
-    constructor(left: Expression, right: Expression) {
-        this.left = left;
-        this.right = right;
-    }
-}
+export class Addition extends Binary {}
+export class Subtraction extends Binary {}
+export class Assignment extends Binary {}
+export class Multiplication extends Binary {}
+export class Division extends Binary {}
