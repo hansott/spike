@@ -88,7 +88,7 @@ class Parser {
         scanner.expect(TokenType.CurlyBracketOpen);
         const token = scanner.peek();
         if (token.is(TokenType.CurlyBracketClose)) {
-            return new BlockStatement([]);
+            return [];
         }
         const statements = [];
         do {
@@ -96,7 +96,7 @@ class Parser {
             const token = scanner.peek();
             if (token.is(TokenType.CurlyBracketClose)) {
                 scanner.next();
-                return new BlockStatement(statements);
+                return statements;
             }
         } while (!scanner.eof());
         throw new Error;
@@ -126,8 +126,8 @@ class Parser {
         scanner.expect(TokenType.Function);
         const identifier = scanner.expect(TokenType.Identifier);
         const params = this.parseFunctionDeclarationParams(scanner);
-        const block = this.parseBlockStatement(scanner);
-        return new FunctionDeclaration(identifier.value, params, block);
+        const statements = this.parseBlockStatement(scanner);
+        return new FunctionDeclaration(identifier.value, params, statements);
     }
     parseExpressionStatement(scanner: ScannerToken) {
         const expression = this.parseExpression(scanner);
@@ -147,14 +147,14 @@ class Parser {
         scanner.expect(TokenType.ParenOpen);
         const condition = this.parseExpression(scanner);
         scanner.expect(TokenType.ParenClose);
-        const ifBlock = this.parseBlockStatement(scanner);
+        const ifStatements = this.parseBlockStatement(scanner);
         const token = scanner.peek();
         if (!token.is(TokenType.Else)) {
-            return new IfStatement(condition, ifBlock);
+            return new IfStatement(condition, ifStatements);
         }
         scanner.next();
-        const elseBlock = this.parseBlockStatement(scanner);
-        return new IfElseStatement(condition, ifBlock, elseBlock);
+        const elseStatements = this.parseBlockStatement(scanner);
+        return new IfElseStatement(condition, ifStatements, elseStatements);
     }
     parseStatement(scanner: ScannerToken): Statement {
         const token = scanner.peek();
