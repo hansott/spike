@@ -9,4 +9,14 @@ export default class ScannerToken extends ScannerGeneric<Token> {
         }
         return this.next();
     }
+    expectOneOrMore(type: TokenType) {
+        this.expect(type);
+        while (!this.eof()) {
+            const token = this.peek();
+            if (!token.is(type)) {
+                break;
+            }
+            this.next();
+        }
+    }
 }

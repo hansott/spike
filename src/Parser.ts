@@ -87,7 +87,7 @@ class Parser {
     parseReturnStatement(scanner: ScannerToken) {
         scanner.expect(TokenType.Return);
         const expression = this.parseExpression(scanner);
-        scanner.expect(TokenType.SemiColon);
+        scanner.expectOneOrMore(TokenType.SemiColon);
         return new ReturnStatement(expression);
     }
     parseBlockStatement(scanner: ScannerToken) {
@@ -137,7 +137,7 @@ class Parser {
     }
     parseExpressionStatement(scanner: ScannerToken) {
         const expression = this.parseExpression(scanner);
-        scanner.expect(TokenType.SemiColon);
+        scanner.expectOneOrMore(TokenType.SemiColon);
         return new ExpressionStatement(expression);
     }
     parseVariableDeclaration(scanner: ScannerToken) {
@@ -145,7 +145,7 @@ class Parser {
         const identifier = scanner.expect(TokenType.Identifier);
         scanner.expect(TokenType.Equal);
         const expression = this.parseExpression(scanner);
-        scanner.expect(TokenType.SemiColon);
+        scanner.expectOneOrMore(TokenType.SemiColon);
         return new VariableDeclaration(identifier.value, expression);
     }
     parseIfStatement(scanner: ScannerToken) {
