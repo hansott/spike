@@ -37,13 +37,6 @@ export class ReturnStatement implements Statement {
     }
 }
 
-export class BlockStatement implements Statement {
-    statements: Statement[];
-    constructor(statements: Statement[]) {
-        this.statements = statements;
-    }
-}
-
 export class FunctionDeclaration implements Statement {
     name: string;
     statements: Statement[];
