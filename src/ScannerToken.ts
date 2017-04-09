@@ -1,5 +1,5 @@
 import { ScannerGeneric } from './Scanner';
-import { Token, TokenType } from './Lexer';
+import { Token, TokenType } from './Token';
 
 export default class ScannerToken extends ScannerGeneric<Token> {
     expect(type: TokenType) {

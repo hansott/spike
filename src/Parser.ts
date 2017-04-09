@@ -4,7 +4,8 @@ import {
     IfElseStatement
 } from './Ast';
 import ScannerToken from './ScannerToken';
-import Lexer, { TokenType } from './Lexer';
+import Lexer from './Lexer';
+import { TokenType } from './Token';
 
 class Parser {
     lexer: Lexer;

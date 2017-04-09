@@ -1,4 +1,4 @@
-import { Token, TokenType } from './Lexer';
+import { Token, TokenType } from './Token';
 
 export interface Statement {}
 export interface Expression {}
@@ -94,6 +94,21 @@ export class StringLiteral implements Expression {
     }
 }
 
+abstract class Binary implements Expression {
+    left: Expression;
+    right: Expression;
+    constructor(left: Expression, right: Expression) {
+        this.left = left;
+        this.right = right;
+    }
+}
+
+export class Addition extends Binary {}
+export class Subtraction extends Binary {}
+export class Assignment extends Binary {}
+export class Multiplication extends Binary {}
+export class Division extends Binary {}
+
 export function createBinary(left: Expression, operator: Token, right: Expression) {
     if (operator.is(TokenType.Plus)) {
         return new Addition(left, right);
@@ -112,18 +127,3 @@ export function createBinary(left: Expression, operator: Token, right: Expressio
     }
     throw new Error;
 }
-
-abstract class Binary implements Expression {
-    left: Expression;
-    right: Expression;
-    constructor(left: Expression, right: Expression) {
-        this.left = left;
-        this.right = right;
-    }
-}
-
-export class Addition extends Binary {}
-export class Subtraction extends Binary {}
-export class Assignment extends Binary {}
-export class Multiplication extends Binary {}
-export class Division extends Binary {}
