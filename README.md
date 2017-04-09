@@ -3,6 +3,7 @@
 ## Todo's
 
 * [ ] Operator precedence
+* [ ] Add line/column to tokens
 * [ ] Interpreter
 
 ## Goals
