@@ -2,7 +2,6 @@
 
 ## Todo's
 
-* [ ] Add line/column to tokens
 * [ ] Interpreter
 
 ## Goals

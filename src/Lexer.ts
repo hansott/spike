@@ -23,11 +23,27 @@ export enum TokenType {
 }
 
 export class Token {
-    type: TokenType;
-    value: string;
-    constructor(type: TokenType, value: string) {
+    private type: TokenType;
+    private value: string;
+    private line: number;
+    private column: number;
+    constructor(type: TokenType, value: string, line: number, column: number) {
         this.type = type;
         this.value = value;
+        this.line = line;
+        this.column = column;
+    }
+    getType() {
+        return this.type;
+    }
+    getValue() {
+        return this.value;
+    }
+    getLine() {
+        return this.line;
+    }
+    getColumn() {
+        return this.column;
     }
     is(type: TokenType) {
         return this.type === type;
@@ -56,56 +72,61 @@ export class Token {
 }
 
 export class Lexer {
+    private token(scanner: ScannerString, type: TokenType, value: string) {
+        const line = scanner.line;
+        const column = scanner.column;
+        return new Token(type, value, line, column);
+    }
     private lexString(scanner: ScannerString) {
         scanner.expect('"');
         const value = scanner.until('"');
-        return new Token(TokenType.String, value);
+        return this.token(scanner, TokenType.String, value);
     }
     private lexCurlyBracketOpen(scanner: ScannerString) {
         const curlyBracketOpen = scanner.expect('{');
-        return new Token(TokenType.CurlyBracketOpen, curlyBracketOpen);
+        return this.token(scanner, TokenType.CurlyBracketOpen, curlyBracketOpen);
     }
     private lexCurlyBracketClose(scanner: ScannerString) {
         const curlyBracketClose = scanner.expect('}');
-        return new Token(TokenType.CurlyBracketClose, curlyBracketClose);
+        return this.token(scanner, TokenType.CurlyBracketClose, curlyBracketClose);
     }
     private lexParenOpen(scanner: ScannerString) {
         const parenOpen = scanner.expect('(');
-        return new Token(TokenType.ParenOpen, parenOpen);
+        return this.token(scanner, TokenType.ParenOpen, parenOpen);
     }
     private lexParenClose(scanner: ScannerString) {
         const parenClose = scanner.expect(')');
-        return new Token(TokenType.ParenClose, parenClose);
+        return this.token(scanner, TokenType.ParenClose, parenClose);
     }
     private lexComma(scanner: ScannerString) {
         const comma = scanner.expect(',');
-        return new Token(TokenType.Comma, comma);
+        return this.token(scanner, TokenType.Comma, comma);
     }
     private lexPlus(scanner: ScannerString) {
         const plus = scanner.expect('+');
-        return new Token(TokenType.Plus, plus);
+        return this.token(scanner, TokenType.Plus, plus);
     }
     private lexMin(scanner: ScannerString) {
         const min = scanner.expect('-');
-        return new Token(TokenType.Min, min);
+        return this.token(scanner, TokenType.Min, min);
     }
     private lexMultiply(scanner: ScannerString) {
         const multiply = scanner.expect('*');
-        return new Token(TokenType.Multiply, multiply);
+        return this.token(scanner, TokenType.Multiply, multiply);
     }
     private lexDivide(scanner: ScannerString) {
         const divide = scanner.expect('/');
-        return new Token(TokenType.Divide, divide);
+        return this.token(scanner, TokenType.Divide, divide);
     }
     private lexSemiColon(scanner: ScannerString) {
         const semiColon = scanner.expect(';');
-        return new Token(TokenType.SemiColon, semiColon);
+        return this.token(scanner, TokenType.SemiColon, semiColon);
     }
     private lexEqual(scanner: ScannerString) {
         const semiColon = scanner.expect('=');
-        return new Token(TokenType.Equal, semiColon);
+        return this.token(scanner, TokenType.Equal, semiColon);
     }
-    private checkIfKeyword(identifier: string) {
+    private checkIfKeyword(scanner: ScannerString, identifier: string) {
         let tokenType = TokenType.Identifier;
         if (identifier === 'fn') {
             tokenType = TokenType.Function;
@@ -118,7 +139,7 @@ export class Lexer {
         } else if (identifier === 'else') {
             tokenType = TokenType.Else;
         }
-        return new Token(tokenType, identifier);
+        return this.token(scanner, tokenType, identifier);
     }
     private isFirstOfIdentifier(first: string) {
         return /[a-zA-Z_]/.test(first);
@@ -138,7 +159,7 @@ export class Lexer {
             }
             identifier += scanner.next();
         }
-        return this.checkIfKeyword(identifier);
+        return this.checkIfKeyword(scanner, identifier);
     }
     private lexNumber(scanner: ScannerString) {
         let number = '';
@@ -149,7 +170,7 @@ export class Lexer {
             }
             number += scanner.next();
         }
-        return new Token(TokenType.Number, number);
+        return this.token(scanner, TokenType.Number, number);
     }
     lex(code: string): Array<Token> {
         let tokens: Array<Token> = [];

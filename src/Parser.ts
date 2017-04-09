@@ -17,7 +17,7 @@ class Parser {
         const token = scanner.peek();
         if (token.is(TokenType.ParenClose)) {
             scanner.next();
-            return new FunctionCall(identifier.value, []);
+            return new FunctionCall(identifier.getValue(), []);
         }
         const params = [];
         do {
@@ -25,7 +25,7 @@ class Parser {
             const token = scanner.peek();
             if (token.is(TokenType.ParenClose)) {
                 scanner.next();
-                return new FunctionCall(identifier.value, params);
+                return new FunctionCall(identifier.getValue(), params);
             }
             scanner.expect(TokenType.Comma);
         } while (!scanner.eof());
@@ -38,7 +38,7 @@ class Parser {
             scanner.back();
             return this.parseFunctionCall(scanner);
         }
-        return new Variable(identifier.value);
+        return new Variable(identifier.getValue());
     }
     maybeBinary(scanner: ScannerToken, left: Expression, precedence: number = 0): Expression {
         const token = scanner.peek();
@@ -55,11 +55,11 @@ class Parser {
     }
     parseNumber(scanner: ScannerToken) {
         const number = scanner.expect(TokenType.Number);
-        return new NumberLiteral(number.value);
+        return new NumberLiteral(number.getValue());
     }
     parseString(scanner: ScannerToken) {
         const string = scanner.expect(TokenType.String);
-        return new StringLiteral(string.value);
+        return new StringLiteral(string.getValue());
     }
     parseParen(scanner: ScannerToken) {
         scanner.expect(TokenType.ParenOpen);
@@ -69,7 +69,7 @@ class Parser {
     }
     parseAtom(scanner: ScannerToken) {
         const token = scanner.peek();
-        switch (token.type) {
+        switch (token.getType()) {
             case TokenType.Identifier:
                 return this.parseIdentifier(scanner);
             case TokenType.String:
@@ -79,7 +79,7 @@ class Parser {
             case TokenType.ParenOpen:
                 return this.parseParen(scanner);
         }
-        throw new Error(`Unexpected token ${TokenType[token.type]} with value "${token.value}"`);
+        throw new Error(`Unexpected token ${TokenType[token.getType()]} with value "${token.getValue()}" at ${token.getLine()}:${token.getColumn()}`);
     }
     parseExpression(scanner: ScannerToken): Expression {
         return this.maybeBinary(scanner, this.parseAtom(scanner));
@@ -118,7 +118,7 @@ class Parser {
         do {
             let token = scanner.peek();
             const identifier = scanner.expect(TokenType.Identifier);
-            params.push(identifier.value);
+            params.push(identifier.getValue());
             token = scanner.peek();
             if (token.is(TokenType.ParenClose)) {
                 scanner.next();
@@ -133,7 +133,7 @@ class Parser {
         const identifier = scanner.expect(TokenType.Identifier);
         const params = this.parseFunctionDeclarationParams(scanner);
         const statements = this.parseBlockStatement(scanner);
-        return new FunctionDeclaration(identifier.value, params, statements);
+        return new FunctionDeclaration(identifier.getValue(), params, statements);
     }
     parseExpressionStatement(scanner: ScannerToken) {
         const expression = this.parseExpression(scanner);
@@ -146,7 +146,7 @@ class Parser {
         scanner.expect(TokenType.Equal);
         const expression = this.parseExpression(scanner);
         scanner.expectOneOrMore(TokenType.SemiColon);
-        return new VariableDeclaration(identifier.value, expression);
+        return new VariableDeclaration(identifier.getValue(), expression);
     }
     parseIfStatement(scanner: ScannerToken) {
         scanner.expect(TokenType.If);
@@ -164,7 +164,7 @@ class Parser {
     }
     parseStatement(scanner: ScannerToken): Statement {
         const token = scanner.peek();
-        switch (token.type) {
+        switch (token.getType()) {
             case TokenType.Function:
                 return this.parseFunctionDeclaration(scanner);
             case TokenType.Return:
@@ -178,12 +178,6 @@ class Parser {
     }
     parse(code: string): Program {
         const tokens = this.lexer.lex(code);
-        /*console.log();
-        for (let i = 0; i < tokens.length; i++) {
-            console.log(`${TokenType[tokens[i].type]} ${tokens[i].value}`);
-        }
-        console.log();
-        */
         const scanner = new ScannerToken(tokens);
         const statements = [];
         while (!scanner.eof()) {

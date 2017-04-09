@@ -4,8 +4,12 @@ import { Token, TokenType } from './Lexer';
 export default class ScannerToken extends ScannerGeneric<Token> {
     expect(type: TokenType) {
         const token = this.peek();
-        if (type !== token.type) {
-            throw new Error(`Expected ${TokenType[type]} but instead found ${TokenType[token.type]} with value ${token.value}`);
+        if (!token.is(type)) {
+            const line = token.getLine();
+            const column = token.getColumn();
+            throw new Error(
+                `Expected ${TokenType[type]} but instead found ${TokenType[token.getType()]} with value ${token.getValue()} at ${line}:${column}`
+            );
         }
         return this.next();
     }
