@@ -8,7 +8,7 @@ import Lexer from './Lexer';
 import { TokenType } from './Token';
 
 class Parser {
-    lexer: Lexer;
+    private lexer: Lexer;
     constructor(lexer: Lexer) {
         this.lexer = lexer;
     }
