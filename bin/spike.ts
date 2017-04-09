@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import Compiler from '../src/Compiler';
 import { inspect } from 'util';
 
