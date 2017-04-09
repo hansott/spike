@@ -40,13 +40,16 @@ class Parser {
         }
         return new Variable(identifier.value);
     }
-    maybeBinary(scanner: ScannerToken, parser: (scanner: ScannerToken) => Expression) {
-        const left = parser(scanner);
+    maybeBinary(scanner: ScannerToken, left: Expression, precedence: number = 0): Expression {
         const token = scanner.peek();
         if (token.isOperator()) {
-            scanner.next();
-            const right = this.parseExpression(scanner);
-            return createBinary(left, token, right);
+            const nextPrecedence = token.getPrecedence();
+            if (nextPrecedence > precedence) {
+                scanner.next();
+                const right = this.maybeBinary(scanner, this.parseAtom(scanner), nextPrecedence);
+                const binary = createBinary(left, token, right);
+                return this.maybeBinary(scanner, binary, precedence);
+            }
         }
         return left;
     }
@@ -64,19 +67,22 @@ class Parser {
         scanner.expect(TokenType.ParenClose);
         return expression;
     }
-    parseExpression(scanner: ScannerToken): Expression {
+    parseAtom(scanner: ScannerToken) {
         const token = scanner.peek();
         switch (token.type) {
             case TokenType.Identifier:
-                return this.maybeBinary(scanner, this.parseIdentifier.bind(this));
+                return this.parseIdentifier(scanner);
             case TokenType.String:
-                return this.maybeBinary(scanner, this.parseString);
+                return this.parseString(scanner);
             case TokenType.Number:
-                return this.maybeBinary(scanner, this.parseNumber);
+                return this.parseNumber(scanner);
             case TokenType.ParenOpen:
-                return this.maybeBinary(scanner, this.parseParen.bind(this));
+                return this.parseParen(scanner);
         }
         throw new Error(`Unexpected token ${TokenType[token.type]} with value "${token.value}"`);
+    }
+    parseExpression(scanner: ScannerToken): Expression {
+        return this.maybeBinary(scanner, this.parseAtom(scanner));
     }
     parseReturnStatement(scanner: ScannerToken) {
         scanner.expect(TokenType.Return);

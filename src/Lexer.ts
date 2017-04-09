@@ -32,6 +32,18 @@ export class Token {
     is(type: TokenType) {
         return this.type === type;
     }
+    getPrecedence() {
+        if (this.is(TokenType.Multiply) || this.is(TokenType.Divide)) {
+            return 3;
+        }
+        if (this.is(TokenType.Plus) || this.is(TokenType.Min)) {
+            return 2;
+        }
+        if (this.is(TokenType.Equal)) {
+            return 1;
+        }
+        return 0;
+    }
     isOperator() {
         return (
             this.is(TokenType.Plus) ||
