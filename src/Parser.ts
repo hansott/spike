@@ -1,5 +1,5 @@
 import {
-    Program, Statement, ExpressionStatement, FunctionDeclaration, BlockStatement, ReturnStatement, Expression,
+    Program, Statement, ExpressionStatement, FunctionDeclaration, ReturnStatement, Expression,
     Variable, FunctionCall, StringLiteral, NumberLiteral, createBinary, VariableDeclaration, IfStatement,
     IfElseStatement
 } from './Ast';
