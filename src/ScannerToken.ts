@@ -8,7 +8,7 @@ export default class ScannerToken extends ScannerGeneric<Token> {
             const line = token.getLine();
             const column = token.getColumn();
             throw new Error(
-                `Expected ${TokenType[type]} but instead found ${TokenType[token.getType()]} with value ${token.getValue()} at ${line}:${column}`
+                `Expected ${TokenType[type]} but instead found ${TokenType[token.getType()]} with value "${token.getValue()}" at ${line}:${column}`
             );
         }
         return this.next();
