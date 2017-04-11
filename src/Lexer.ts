@@ -58,15 +58,16 @@ export class Lexer {
     }
     private checkIfKeyword(scanner: ScannerString, identifier: string) {
         let tokenType = TokenType.Identifier;
-        if (identifier === 'fn') {
+        const identifierLower = identifier.toLowerCase();
+        if (identifierLower === 'fn') {
             tokenType = TokenType.Function;
-        } else if (identifier === 'return') {
+        } else if (identifierLower === 'return') {
             tokenType = TokenType.Return;
-        } else if (identifier === 'var') {
+        } else if (identifierLower === 'var') {
             tokenType = TokenType.Var;
-        } else if (identifier === 'if') {
+        } else if (identifierLower === 'if') {
             tokenType = TokenType.If;
-        } else if (identifier === 'else') {
+        } else if (identifierLower === 'else') {
             tokenType = TokenType.Else;
         }
         return this.token(scanner, tokenType, identifier);
