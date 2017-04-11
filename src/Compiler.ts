@@ -6,14 +6,18 @@ import { readFile } from 'fs';
 class Compiler {
     compileFile(path: string) {
         return new Promise((resolve, reject) => {
-            readFile(path, (err: NodeJS.ErrnoException, data: Buffer) => {
+            readFile(path, (err, data) => {
                 if (err)  {
                     reject(err);
                 }
                 else {
                     const code = data.toString();
-                    const program = this.compile(code);
-                    resolve(program);
+                    try {
+                        const program = this.compile(code);
+                        resolve(program);
+                    } catch (error) {
+                        reject(error);
+                    }
                 }
             });
         });

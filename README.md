@@ -1,13 +1,9 @@
 # Spike
 
-## Todo's
-
-* [ ] Interpreter
-
 ## Goals
 
 * Learn TypeScript
-* Learn how a programming language is interpreted
+* Learn how a compiler works
 
 ## Requirements
 
@@ -22,5 +18,7 @@
 
 ## Usage
 
-* `$ yarn global add ts-node typescript`
-* `$ ts-node bin/spike.ts`
+Make sure you have `ts-node` and `typescript` globally installed (`$ yarn global add ts-node typescript`).
+
+* `$ ts-node bin/spike.ts spec.spike`
+* `$ ts-node bin/spike.ts spec.spike --ast`

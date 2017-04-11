@@ -1,12 +1,28 @@
 import { Token, TokenType } from './Token';
 
-export interface Statement {}
-export interface Expression {}
+function javaScriptFunctionName(name: string) {
+    return '__' + name;
+}
+
+export interface Statement {
+    toJavaScript(): string[];
+}
+
+export interface Expression {
+    toJavaScript(): string;
+}
 
 export class Program implements Statement {
     statements: Statement[];
     constructor(statements: Statement[]) {
         this.statements = statements;
+    }
+    toJavaScript(): string[] {
+        let lines: string[] = [];
+        this.statements.forEach(statement => {
+            lines = lines.concat(statement.toJavaScript());
+        });
+        return lines;
     }
 }
 
@@ -16,6 +32,14 @@ export class IfStatement implements Statement {
     constructor(condition: Expression, ifStatements: Statement[]) {
         this.condition = condition;
         this.ifStatements = ifStatements;
+    }
+    toJavaScript(): string[] {
+        let lines = [`if (${this.condition.toJavaScript()}) {`];
+        this.ifStatements.forEach(statement => {
+            lines = lines.concat(statement.toJavaScript().map(statement => '    ' + statement));
+        });
+        lines.push('}');
+        return lines;
     }
 }
 
@@ -28,12 +52,29 @@ export class IfElseStatement implements Statement {
         this.ifStatements = ifStatements;
         this.elseStatements = elseStatements;
     }
+    toJavaScript(): string[] {
+        let lines = [`if (${this.condition.toJavaScript()}) {`];
+        this.ifStatements.forEach(statement => {
+            lines = lines.concat(statement.toJavaScript().map(statement => '    ' + statement));
+        });
+        lines.push('} else {');
+        this.elseStatements.forEach(statement => {
+            lines = lines.concat(statement.toJavaScript().map(statement => '    ' + statement));
+        });
+        lines.push('}');
+        return lines;
+    }
 }
 
 export class ReturnStatement implements Statement {
     expression: Expression;
     constructor(expression: Expression) {
         this.expression = expression;
+    }
+    toJavaScript(): string[] {
+        return [
+            `return ${this.expression.toJavaScript()}`,
+        ];
     }
 }
 
@@ -46,6 +87,15 @@ export class FunctionDeclaration implements Statement {
         this.params = params;
         this.statements = statements;
     }
+    toJavaScript(): string[] {
+        const params = this.params.join(', ');
+        let lines = [`function ${javaScriptFunctionName(this.name)}(${params}) {`];
+        this.statements.forEach(statement => {
+            lines = lines.concat(statement.toJavaScript().map(statement => '    ' + statement));
+        });
+        lines.push('}');
+        return lines;
+    }
 }
 
 export class VariableDeclaration implements Statement {
@@ -55,6 +105,11 @@ export class VariableDeclaration implements Statement {
         this.name = name;
         this.init = init;
     }
+    toJavaScript(): string[] {
+        return [
+            `let ${this.name} = ${this.init.toJavaScript()}`,
+        ];
+    }
 }
 
 export class ExpressionStatement implements Statement {
@@ -62,12 +117,20 @@ export class ExpressionStatement implements Statement {
     constructor(expression: Expression) {
         this.expression = expression;
     }
+    toJavaScript(): string[] {
+        return [
+            `${this.expression.toJavaScript()}`,
+        ];
+    }
 }
 
 export class Variable implements Expression {
     name: string;
     constructor(name: string) {
         this.name = name;
+    }
+    toJavaScript(): string {
+        return this.name;
     }
 }
 
@@ -78,6 +141,16 @@ export class FunctionCall implements Expression {
         this.name = name;
         this.params = params;
     }
+    toJavaScript(): string {
+        const params = this.params.map(param => param.toJavaScript()).join(', ');
+        let name = this.name;
+        if (name === 'print') {
+            name = 'console.log';
+        } else {
+            name = javaScriptFunctionName(name);
+        }
+        return `${name}(${params})`;
+    }
 }
 
 export class NumberLiteral implements Expression {
@@ -85,12 +158,18 @@ export class NumberLiteral implements Expression {
     constructor(value: string) {
         this.value = value;
     }
+    toJavaScript(): string {
+        return this.value.toString();
+    }
 }
 
 export class StringLiteral implements Expression {
     value: string;
     constructor(value: string) {
         this.value = value;
+    }
+    toJavaScript(): string {
+        return `"${this.value}"`;
     }
 }
 
@@ -101,13 +180,40 @@ abstract class Binary implements Expression {
         this.left = left;
         this.right = right;
     }
+    toJavaScript(): string {
+        throw new Error;
+    }
 }
 
-export class Addition extends Binary {}
-export class Subtraction extends Binary {}
-export class Assignment extends Binary {}
-export class Multiplication extends Binary {}
-export class Division extends Binary {}
+export class Addition extends Binary {
+    toJavaScript(): string {
+        return `${this.left.toJavaScript()} + ${this.right.toJavaScript()}`;
+    }
+}
+
+export class Subtraction extends Binary {
+    toJavaScript(): string {
+        return `${this.left.toJavaScript()} - ${this.right.toJavaScript()}`;
+    }
+}
+
+export class Multiplication extends Binary {
+    toJavaScript(): string {
+        return `${this.left.toJavaScript()} * ${this.right.toJavaScript()}`;
+    }
+}
+
+export class Division extends Binary {
+    toJavaScript(): string {
+        return `${this.left.toJavaScript()} / ${this.right.toJavaScript()}`;
+    }
+}
+
+export class Assignment extends Binary {
+    toJavaScript(): string {
+        return `${this.left.toJavaScript()} = ${this.right.toJavaScript()}`;
+    }
+}
 
 export function createBinary(left: Expression, operator: Token, right: Expression) {
     if (operator.is(TokenType.Plus)) {
